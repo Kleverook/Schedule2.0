@@ -1,22 +1,25 @@
 window.onload = function () {
-    check_login = function (element) {
-        console.log(element.value)
-    }
+
 
     check_user = function () {
-        login = document.getElementById('login')
-        password = document.getElementById('password')
-        console.log(login.value)
-        console.log(password.value)
+        let login = document.getElementById('login')
+        let password = document.getElementById('password')
 
-        xmlhttp = getXmlHttp()
-        xmlhttp.open('GET', '/api?login='+login.value+"&password="+password.value, true)
-        xmlhttp.setRequestHeader('Content-Type', 'text/plain')
-        xmlhttp.send("")
+        let xmlhttp = getXmlHttp()
+        xmlhttp.open('POST', '/api', true)
+        xmlhttp.setRequestHeader('Content-Type', 'application/json')
+        xmlhttp.send(JSON.stringify({"password": password.value, "login": login.value, "api_method": "check_user"}))
         xmlhttp.onreadystatechange = function () {
             if (xmlhttp.readyState == 4) {
                 if (xmlhttp.status == 200) {
-                    console.log(xmlhttp.responseText)
+                    let answer = JSON.parse(xmlhttp.responseText)
+                    let error = document.getElementById('error_box')
+                    if (answer['state']) {
+                        error.style.visibility = 'hidden'
+                        set_cookie('login_key', answer['loginKey'])
+                    } else {
+                        error.style.visibility = 'visible'
+                    }
                 }
             }
         }

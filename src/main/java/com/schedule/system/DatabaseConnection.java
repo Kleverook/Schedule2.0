@@ -1,6 +1,7 @@
 package com.schedule.system;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseConnection {
@@ -11,6 +12,7 @@ public class DatabaseConnection {
     Connection c;
     Statement stmt;
     String sql;
+
     public void connectionDB() {
         try {
             Class.forName("org.postgresql.Driver");
@@ -25,6 +27,19 @@ public class DatabaseConnection {
         }
     }
 
+    public void setAuthPerson(AuthPerson personList) throws SQLException {
+        stmt = c.createStatement();
+        sql = "INSERT INTO AUTH_PERSON (login, password, name, surname,id_role) VALUES ";
+
+        System.out.println("select");
+        sql += String.format("('%s', '%s', '%s', '%s', %s); ", personList.getLogin(), personList.getPassword(), personList.getName(), personList.getSurname(), 2);
+
+//        sql = sql.substring(0, sql.length() - 2) + " ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, SHORT_TITLE = EXCLUDED.SHORT_TITLE;";
+       System.out.println(sql);
+        stmt.execute(sql);
+        c.commit();
+    }
+
     public void setDivisionList(List<DivisionList> divisionList) throws SQLException {
         stmt = c.createStatement();
         sql = "INSERT INTO LIST_DIVISION (ID,TITLE,SHORT_TITLE) VALUES ";
@@ -37,6 +52,62 @@ public class DatabaseConnection {
         c.commit();
 
     }
+
+    public List<AuthPerson> getAuthPerson() throws SQLException {
+
+
+        List<AuthPerson> listPerson = new ArrayList<>();
+
+        stmt = c.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT * FROM auth_person;");
+        while (rs.next()) {
+            AuthPerson person = new AuthPerson();
+            person.id = rs.getInt("id");
+            person.id_role = rs.getInt("id_role");
+            person.login = rs.getString("login");
+            person.password = rs.getString("password");
+            person.name = rs.getString("name");
+            person.surname = rs.getString("surname");
+            person.google_calendar_key = rs.getString("google_calendar_key");
+            person.phone_number = rs.getString("phone_number");
+            person.login_key = rs.getString("login_key");
+
+            listPerson.add(person);
+        }
+        rs.close();
+        stmt.close();
+        c.commit();
+        return listPerson;
+    }
+
+    public AuthPerson findPerson(List<AuthPerson> personList, String login, String password) {
+        int j = -1;
+        for (int i = 0; i < personList.size(); i++) {
+            System.out.println(personList.get(i).login);
+
+            System.out.println(personList.get(i).login.equals(login) && personList.get(i).password.equals(password));
+            if (personList.get(i).login.equals(login) && personList.get(i).password.equals(password)) {
+                j = i;
+                return personList.get(i);
+            }
+        }
+        if (j != -1) {
+            return personList.get(j);
+        } else return null;
+    }
+
+    public boolean findLogin(List<AuthPerson> personList, String login) {
+        int j = -1;
+        for (int i = 0; i < personList.size(); i++) {
+            if (personList.get(i).login.equals(login)) {
+                j = i;
+            }
+        }
+        if (j != -1) {
+            return true;
+        } else return false;
+    }
+//    public
     //-------------- CREATE TABLE ---------------
 //            stmt = c.createStatement();
 //            sql = "CREATE TABLE COMPANY " +

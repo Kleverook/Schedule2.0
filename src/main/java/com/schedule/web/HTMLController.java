@@ -19,6 +19,11 @@ public class HTMLController {
 
         return "login";
     }
+    @GetMapping("/register")
+    public String register() {
+
+        return "register";
+    }
 
 
 }

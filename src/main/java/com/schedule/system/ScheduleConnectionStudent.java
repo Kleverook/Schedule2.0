@@ -33,10 +33,6 @@ class TmpNumberWeak{
     public int getcomputed(){return computed;}
 
 }
-class JSONSchedule{
-    public String Authorization;
-    public ScheduleList schedule;
-}
 
 class KurList {
     private int kurs;
